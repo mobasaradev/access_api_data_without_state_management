@@ -1,13 +1,14 @@
 import 'dart:developer' as dev show log;
-
 import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl = 'https://jsonplaceholder.typicode.com';
-  Future<http.Response?> fetchPhoto() async {
+  Future<http.StreamedResponse?> fetchPhoto() async {
+    Map<String, String> headers = {'User-Agent': 'application/json'};
     final url = Uri.parse('$baseUrl/photos');
+    final request = http.Request('GET', url)..headers.addAll(headers);
     try {
-      final response = await http.get(url);
+      var response = await request.send();
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;
       }
