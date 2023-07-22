@@ -1,5 +1,4 @@
 import 'package:access_api/models/photo.dart';
-import 'package:access_api/repositories/photos/photo_repo.dart';
 import 'package:access_api/services/api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -8,46 +7,37 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PhotosRepo photosRepo = PhotosRepo(apiService: ApiService());
-    final photoFetch = photosRepo.getPhotos();
+    final photos = ApiService().getPhoto();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Api"),
+        title: const Text("Get Api without State Management"),
       ),
-      body: FutureBuilder<List<Photo>>(
-        future: photoFetch,
+      body: FutureBuilder<List<Photo>?>(
+        future: photos,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return const Center(
-              child: Text('Error occurred while fetching data.'),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No photos available.'),
             );
           } else {
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
               ),
-              itemCount: snapshot.data!.length,
+              itemCount: snapshot.data?.length,
               itemBuilder: (context, index) {
-                final data = snapshot.data![index];
+                final data = snapshot.data;
                 return Card(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.network(data.thumbnailUrl),
+                      Image.network(data![index].thumbnailUrl),
                       const SizedBox(height: 5),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
-                          data.title,
+                          data[index].title,
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
